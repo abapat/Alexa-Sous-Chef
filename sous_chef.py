@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_ask import Ask, request, session, question, statement
+import db
 
 app = Flask(__name__)
 ask = Ask(app, '/')
@@ -9,9 +10,6 @@ ingredients = [
 ]
 ingredientIndex = 0
 
-instructions = [
-'1. Boil water', '2. Peel potatoes', '3. Eat potatoes'
-]
 instructionCounter = 1
 
 @ask.launch
@@ -21,23 +19,27 @@ def launch():
 
 @ask.intent('RecipeIntent')
 def recipe(Dish):
-    text = render_template('recipe', Dish=Dish)
-    text += " Dish 1: beef stew. Dish 2: beef stroganoff. Please say the dish number you'd like to make, or say more for more options."
+    session.attributes['dishes'] = db.getRecipe(Dish)
+    text = render_template('recipe', numResults=str(len(session.attributes['dishes'])), Dish=Dish)
+    for x in range(len(session.attributes['dishes'])):
+        text += "Dish " + str(x + 1) + ": " + session.attributes['dishes'][x][1] + ","
+    text += ". Please say the dish number you'd like to make, or say more for more options."
     reprompt_text = "I didn't catch that. What would you like to make?"
-    session.attributes['dish'] = Dish
     return question(text).reprompt(reprompt_text)
 
 @ask.intent('PickIntent', convert={'Selection' : int})
 def sendIngredients(Selection):
-    text = "Okay, I'm sending the ingedient list for " + str(Selection) +" to your phone."
-    text += "If you'd like me to read out the ingredients, tell me to list them."
-    text += "Otherwise, say Let's Cook to let me know when you have everything."
-    reprompt_text += "Sory, I didn't hear what you said. Do you want me to read the ingredients or are you ready to start cooking?"
-    return question(text).reprompt(reprompt_text)
+    session.attributes['selectedDish'] = session.attributes['dishes'][Selection - 1]
+    selectedDish = session.attributes['selectedDish']
+    text = "Okay, I'm sending the ingredient list for " + selectedDish[1] +" to your phone."
+    session.attributes['ingredients'] = db.getIngredients(selectedDish[0])
+    text += " If you'd like me to read out the ingredients, tell me to list them."
+    text += " Otherwise, say Let's Cook to let me know when you have everything."
+    reprompt_text = "Sorry, I didn't hear what you said. Do you want me to read the ingredients or are you ready to start cooking?"
+    return question(text).reprompt(reprompt_text).simple_card()
 
 @ask.intent('ListIngredients')
 def listIngredients():
-
     text = ""
     global ingredientIndex
 
@@ -45,7 +47,7 @@ def listIngredients():
         text += render_template('ingredients', Dish=session.attributes['dish'])
 
     for x in range(5):
-        if ingredientIndex < len(ingredients):
+        if ingredientIndex < len(session.attributes['i']):
             text += ingredients[ingredientIndex] + ", "
             ingredientIndex += 1
         else:
@@ -62,20 +64,33 @@ def listIngredients():
 
 @ask.intent("CookingIntent")
 def cooking():
-    text=instructions[0]
+    selectedDishId = session.attributes['selectedDish'][0]
+    session.attributes['instructions'] = db.getDirections(selectedDishId)
+    text = session.attributes['instructions'][0]
     return question(text)
-
-
 
 @ask.intent('AMAZON.NextIntent')
 def instruction():
     global instructionCounter
+    instructions = session.attributes['instructions']
     if instructionCounter < len(instructions):
-        text=instructions[instructionCounter]
+        text = instructions[instructionCounter]
         instructionCounter += 1
     else:
         text="No more instructions. Bon appetite!"
         return statement(text)
+
+    return question(text)
+
+@ask.intent('AMAZON.PreviousIntent')
+def goBack():
+    global instructionCounter
+    if instructionCounter < 0:
+        instructionCounter -= 1
+        text=instructions[instructionCounter]
+    else:
+        text= instructions[instructionCounter] + ". This is the first step."
+        instructionCounter = 0
 
     return question(text)
 

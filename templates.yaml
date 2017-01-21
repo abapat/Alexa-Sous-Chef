@@ -1,2 +1,2 @@
-recipe: I found 3 dishes for {{ Dish }}.
+recipe: I found {{ numResults }} dishes for {{ Dish }}
 ingredients: Ingredients for {{ Dish }} are

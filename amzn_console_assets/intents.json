@@ -1,0 +1,53 @@
+{
+    "intents": [
+      {
+        "intent": "AMAZON.YesIntent"
+      },
+      {
+        "intent": "AMAZON.NoIntent"
+      },
+      {
+        "intent": "AMAZON.CancelIntent"
+      },
+      {
+        "intent": "AMAZON.NextIntent"
+      },
+      {
+        "intent": "AMAZON.PreviousIntent"
+      },
+      {
+        "intent": "AMAZON.RepeatIntent"
+      },
+      {
+        "intent": "AMAZON.StopIntent"
+      },
+      {
+        "intent": "AMAZON.HelpIntent"
+      },
+      {
+        "intent": "RecipeIntent",
+        "slots": [
+          {
+          	"name": "Dish",
+            "type": "AMAZON.LITERAL"
+          }
+        ]
+      },
+      {
+        "intent": "PickIntent",
+        "slots": [
+          {
+            "name": "Selection",
+            "type": "NUMBER"
+          }
+        ]
+      },
+      {
+        "intent": "ListIngredients"
+      },
+      {
+        "intent": "CookingIntent"
+      }
+  ]
+
+}
