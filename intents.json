@@ -25,7 +25,22 @@
         "intent": "AMAZON.HelpIntent"
       },
       {
-        "intent": "HelloWorldIntent"
+        "intent": "RecipeIntent",
+        "slots": [
+          {
+          	"name": "Dish",
+            "type": "AMAZON.LITERAL"
+          }
+        ]
+      },
+      {
+        "intent": "PickIntent",
+        "slots": [
+          {
+            "name": "Selection",
+            "type": "AMAZON.LITERAL"
+          }
+        ]
       }
   ]
 

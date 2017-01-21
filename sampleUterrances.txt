@@ -1,7 +1,11 @@
-AMAZON.YesIntent HelloHelloWorldIntent say hello
-HelloWorldIntent say hello world
-HelloWorldIntent hello
-HelloWorldIntent say hi
-HelloWorldIntent say hi world
-HelloWorldIntent hi
-HelloWorldIntent how are you
+AMAZON.YesIntent say hello
+
+RecipeIntent recipe {beef|Dish}
+RecipeIntent recipe for {beef|Dish}
+RecipeIntent get me a recipe {beef|Dish}
+RecipeIntent what's a recipe for {beef|Dish}
+RecipeIntent what is a recipe for {beef|Dish}
+RecipeIntent tell me a recipe for {beef|Dish}
+RecipeIntent I want a recipe for {beef|Dish}
+
+PickIntent {beef|Selection}
