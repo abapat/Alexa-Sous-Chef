@@ -1,17 +1,21 @@
 import urllib
 import re
+import pprint
 from food_network_wrapper import recipe_search, get_n_recipes, scrape_recipe
 
-BASE_URL = "http://www.foodnetwork.com/recipes/a-z.html"
-
-if __name__ == "__main__":
-    main()
+BASE_URL = "http://www.foodnetwork.com"
+BASE_RECIPE_URL = "http://www.foodnetwork.com/recipes/a-z.html"
 
 def main():
+    '''
     dishes = scrape(baseUrl)
     for entry in dishes:
         recipe = getRecipe(entry)
         print(recipe)
+
+    '''
+    print(getNameLinks(BASE_RECIPE_URL))
+    #print(ret)
 
 '''
 Scrapes Food Network starting at baseUrl for a list of dishes
@@ -58,7 +62,14 @@ Gets links to all recipes- starting with A, B, C, ..., etc.
 @return list of links
 '''
 def getNameLinks(baseUrl):
-    return None
+    links = []
+    html = getHTML(baseUrl)
+    match = re.search('(?s)a-to-z-btns">(.*?)</section>', html)
+    res = re.findall('(?s)<li ><a href="(.*?)">', match.group(0))
+    for r in res:
+        links.append(BASE_URL + r)
+
+    return links
 
 '''
 TODO
@@ -86,11 +97,16 @@ def getRecipe(recipe):
     recipes = []
     results = recipe_search(recipe)
     for result in results:
-        print("Scraping %s: %s" % (i.title,i.url))
-        recipes.append(scrape_recipe(i.url))
+        print("Scraping %s: %s" % (result.title,result.url))
+        recipes.append(scrape_recipe(result.url))
 
     ret = []
     for r in recipes:
-        ret.append((r.i.title, r.total_time, r.prep_time, r.cook_time, r.servings, r.ingredients, r.directions))
+        ret.append((r.title, r.total_time, r.prep_time, r.cook_time, r.servings, r.ingredients, r.directions))
+        print(r.categories)
 
     return ret
+
+if __name__ == "__main__":
+    main()
+
