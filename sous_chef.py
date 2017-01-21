@@ -4,6 +4,16 @@ from flask_ask import Ask, request, session, question, statement
 app = Flask(__name__)
 ask = Ask(app, '/')
 
+ingredients = [
+'120mg water', '300g beef', '10lbs chicken', 'test', 'tesint', 'rewrwf'
+]
+ingredientIndex = 0
+
+instructions = [
+'1. Boil water', '2. Peel potatoes', '3. Eat potatoes'
+]
+instructionCounter = 0
+
 @ask.launch
 def launch():
     speech_text = 'Welcome to Sous Chef, you can ask me for recipes.'
@@ -18,15 +28,40 @@ def recipe(Dish):
     return question(text).reprompt(reprompt_text)
 
 @ask.intent('PickIntent', convert={'Selection': int})
-def ingredient(Selection):
-    text = render_template('ingredients', Selection=str(Selection))
-    if Selection == 1:
-        text += " one one one"
+def listIngredients(Selection):
 
-    if Selection == 2:
-        text += " two two two"
+    text = ""
+    global ingredientIndex
 
-    return statement(text).simple_card('Ingredients for dish ' + str(Selection), text)
+    if ingredientIndex == 0:
+        text += render_template('ingredients', Selection=str(Selection))
+
+    for x in range(5):
+        if ingredientIndex < len(ingredients):
+            text += ingredients[ingredientIndex] + ", "
+            ingredientIndex += 1
+        else:
+            break;
+    #if ingredientIndex < len(ingredients) - 1:
+    #    text = text + "Say more for the next ingredients."
+    #else:
+    #    text = text + "Those are all the ingredients. We're ready to cook!"
+
+    #if ingredientIndex < 5:
+    #    return question(text).simple_card('Ingredients for dish ' + str(Selection), ingredients)
+
+    return question(text)
+
+@ask.intent('AMAZON.NextIntent')
+def instruction():
+    global instructionCounter
+    if instructionCounter < len(instructions) - 1:
+        instructionCounter += 1
+        text=instructions[instructionCounter]
+    else:
+        text="No more instructions. Bon appetite!"
+
+    return statement(text)
 
 
 @ask.intent('AMAZON.HelpIntent')
