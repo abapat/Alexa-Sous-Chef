@@ -1,2 +1,2 @@
-recipe: 4 Recipes for {{ Dish }}.
+recipe: I found 3 dishes for {{ Dish }}.
 ingredients: Ingredients for {{ Selection }}
