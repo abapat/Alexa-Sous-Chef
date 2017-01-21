@@ -10,7 +10,7 @@
         "intent": "AMAZON.CancelIntent"
       },
       {
-        "intent": "MAZON.NextIntent"
+        "intent": "AMAZON.NextIntent"
       },
       {
         "intent": "AMAZON.PreviousIntent"
@@ -38,9 +38,15 @@
         "slots": [
           {
             "name": "Selection",
-            "type": "AMAZON.LITERAL"
+            "type": "NUMBER"
           }
         ]
+      },
+      {
+        "intent": "ListIngredients"
+      },
+      {
+        "intent": "CookingIntent"
       }
   ]
 

@@ -12,7 +12,7 @@ ingredientIndex = 0
 instructions = [
 '1. Boil water', '2. Peel potatoes', '3. Eat potatoes'
 ]
-instructionCounter = 0
+instructionCounter = 1
 
 @ask.launch
 def launch():
@@ -27,14 +27,22 @@ def recipe(Dish):
     session.attributes['dish'] = Dish
     return question(text).reprompt(reprompt_text)
 
-@ask.intent('PickIntent', convert={'Selection': int})
-def listIngredients(Selection):
+@ask.intent('PickIntent', convert={'Selection' : int})
+def sendIngredients(Selection):
+    text = "Okay, I'm sending the ingedient list for " + str(Selection) +" to your phone."
+    text += "If you'd like me to read out the ingredients, tell me to list them."
+    text += "Otherwise, say Let's Cook to let me know when you have everything."
+    reprompt_text += "Sory, I didn't hear what you said. Do you want me to read the ingredients or are you ready to start cooking?"
+    return question(text).reprompt(reprompt_text)
+
+@ask.intent('ListIngredients')
+def listIngredients():
 
     text = ""
     global ingredientIndex
 
     if ingredientIndex == 0:
-        text += render_template('ingredients', Selection=str(Selection))
+        text += render_template('ingredients', Dish=session.attributes['dish'])
 
     for x in range(5):
         if ingredientIndex < len(ingredients):
@@ -52,16 +60,24 @@ def listIngredients(Selection):
 
     return question(text)
 
+@ask.intent("CookingIntent")
+def cooking():
+    text=instructions[0]
+    return question(text)
+
+
+
 @ask.intent('AMAZON.NextIntent')
 def instruction():
     global instructionCounter
-    if instructionCounter < len(instructions) - 1:
-        instructionCounter += 1
+    if instructionCounter < len(instructions):
         text=instructions[instructionCounter]
+        instructionCounter += 1
     else:
         text="No more instructions. Bon appetite!"
+        return statement(text)
 
-    return statement(text)
+    return question(text)
 
 
 @ask.intent('AMAZON.HelpIntent')
