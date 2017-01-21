@@ -42,7 +42,10 @@ def get_recipes(Dish):
     session.attributes['dishes'] = db.getRecipe(Dish)
     app.logger.debug(session.attributes['dishes'])
     dishResults = session.attributes['dishes']
+
     text = render_template('recipe', numResults = str(len(dishResults)), Dish = Dish)
+    if len(dishResults) == 0:
+        return sup.reprompt_error
 
     for x in range(len(dishResults)):
         text += " Dish " + str(x+1) + " " + dishResults[x][1] + ","
@@ -65,6 +68,7 @@ def send_ingredients(Selection):
     if selectedTuple == None:
         return sup.reprompt_error
 
+
     session.attributes['selectedDish'] = selectedTuple
     selectedDish = selectedTuple
     text = render_template('ingredients', Dish=selectedDish[1])
@@ -74,7 +78,7 @@ def send_ingredients(Selection):
     otherInfo = db.getOtherInfo(selectedDish[0])
     app.logger.debug(otherInfo)
     selectedDishImage = otherInfo[2]
-    return question(text).simple_card(selectedDish[1], session.attributes['ingredients'])
+    return question(text).standard_card(selectedDish[1], session.attributes['ingredients'], "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api", "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api")
 
 @ask.intent('ListIngredients')
 @sup.guide
@@ -95,14 +99,14 @@ def list_ingredients():
     if ingredientIndex < len(ingredients):
         text = text + "Say more for the next ingredients."
     else:
-        text = text + "Those are all the ingredients. We're ready to cook! "
-        cooking()
+        return cooking()
 
     return question(text)
 
 @ask.intent("CookingIntent")
 @sup.guide
 def cooking():
+    text = "Alright, we're ready to cook! "
     selectedDishId = session.attributes['selectedDish'][0]
     session.attributes['instructions'] = db.getDirections(selectedDishId).split('.')
     text = session.attributes['instructions'][0]
@@ -113,11 +117,11 @@ def cooking():
 def next_instruction():
     global instructionCounter
     instructions = session.attributes['instructions']
-    if instructionCounter < len(instructions):
+    if instructionCounter < len(instructions) - 1:
         text = instructions[instructionCounter]
         instructionCounter += 1
     else:
-        done_cooking()
+        return done_cooking()
 
     return question(text)
 

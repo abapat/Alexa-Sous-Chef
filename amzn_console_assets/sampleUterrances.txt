@@ -6,25 +6,43 @@ AMAZON.NextIntent next direction
 AMAZON.NextIntent next step
 AMAZON.NextIntent continue
 
-RecipeIntent {beef|Dish} recipe
-RecipeIntent recipe for {beef|Dish}
-RecipeIntent get me a recipe {beef|Dish}
-RecipeIntent what's a recipe for {beef|Dish}
-RecipeIntent what is a recipe for {beef|Dish}
-RecipeIntent tell me a recipe for {beef|Dish}
-RecipeIntent I want a recipe for {beef|Dish}
-RecipeIntent How do I make {beef|Dish}
-RecipeIntent How do I cook {beef|Dish}
-RecipeIntent How do I bake {beef|Dish}
+RecipeIntent {Dish}
+RecipeIntent {Dish} recipe
+RecipeIntent recipe for {Dish}
+RecipeIntent recipes for {Dish}
+RecipeIntent get me a recipe {Dish}
+RecipeIntent get a recipe for {Dish}
+RecipeIntent find recipes for {Dish}
+RecipeIntent what's a recipe for {Dish}
+RecipeIntent what is a recipe for {Dish}
+RecipeIntent tell me a recipe for {Dish}
+RecipeIntent tell me how to make {Dish}
+RecipeIntent I want a recipe for {Dish}
+RecipeIntent I want to make {Dish}
+RecipeIntent How do I make {Dish}
+RecipeIntent How do I cook {Dish}
+RecipeIntent How do I bake {Dish}
+RecipeIntent Search for {Dish}
+RecipeIntent Search for recipes for {Dish}
 
 PickIntent {Selection}
 PickIntent number {Selection}
-PickIntent dish {Selection}
 PickIntent recipe {Selection}
 
+ListIngredients Read
+ListIngredients Read the ingredients
+ListIngredients Read them out loud
+ListIngredients Read them
 ListIngredients List the ingredients
 ListIngredients Tell me the ingredients
+ListIngredients Tell me more ingredients
+ListIngredients More ingredients
+ListIngredients More
 
 CookingIntent cook
 CookingIntent Let's cook
 CookingIntent Start cooking
+
+ReturnIntent Go back
+ReturnIntent Previous
+ReturnIntent Undo
