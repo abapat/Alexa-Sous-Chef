@@ -2,9 +2,18 @@ import sqlite3
 import os
 
 tables = ["Create table if not exists recipe(id INTEGER PRIMARY KEY, title TEXT NOT NULL, description TEXT, cook_time TEXT, servings INTEGER, ingredients TEXT, directions TEXT, image_url TEXT, category TEXT);"]
+MAX_RESULTS = 5
 
 def main():
     initDB()
+
+    result = getRecipe("cookie")
+    for res in result:
+        print(getIngredients(res[0]))
+        print(getDirections(res[0]))
+        print(getOtherInfo(res[0]))
+
+    print(getOtherInfo(41435235))
 
 def getConn():
     return sqlite3.connect("data.db")
@@ -32,15 +41,55 @@ def logRecipe(title, description, cook_time, servings, ingredients, directions, 
 
     conn.close()
 
-def getRecipe(dish):
+def getRecipe(title):
     conn = getConn()
     cursor = conn.cursor()
 
-    sql = "Select * from recipe where title like '%" + dish + "%';"
-    print(sql)
+    sql = "Select id,title from recipe where title like '%" + title + "%' limit " + str(MAX_RESULTS) + ";"
+    
     cursor.execute(sql)
     res = cursor.fetchall()
     return res
+
+def getIngredients(i):
+    conn = getConn()
+    cursor = conn.cursor()
+
+    sql = "Select ingredients from recipe where id=%s;" % i
+    
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    conn.close()
+    if res == None:
+        return res
+
+    return res[0]
+
+def getDirections(i):
+    conn = getConn()
+    cursor = conn.cursor()
+
+    sql = "Select directions from recipe where id=%s;" % i
+    
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    conn.close()
+    if res == None:
+        return res
+
+    return res[0]
+
+def getOtherInfo(i):
+    conn = getConn()
+    cursor = conn.cursor()
+
+    sql = "Select cook_time,servings,image_url from recipe where id=%s;" % i
+    
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    conn.close()
+    return res
+
 
 if __name__ == "__main__":
     main()
