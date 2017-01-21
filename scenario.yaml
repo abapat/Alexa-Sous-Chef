@@ -1,0 +1,47 @@
+# start and finish steps in scenario
+first_step: init
+last_step: done
+default_help: "You can ask me for recipes! Like, recipes for beef stew. Or, tell me how to make Philly Cheesesteaks."
+
+steps:
+  # minimal description for the first step
+  init:
+    events:
+      launched:
+        next: search_recipe
+
+  # step name
+  search_recipe:
+    # reprompt if wrong intent was invoked
+    reprompt: "Sorry, I didn't understand, can you try again?"
+    # help phrase for the current step
+    help: "You can tell me a recipe to search for."
+    events:
+      get_recipes:
+        next: ingredients
+
+  ingredients:
+      reprompt: "Sorry, I didn't understand, can you say the dish again?"
+      help: "Which dish would you like the ingredients for?"
+      events:
+        send_ingredients:
+          next: send_ingredients
+
+  send_ingredients:
+    reprompt: "Sorry, I didn't understand, did you want me to read the ingredients or start cooking?"
+    help: "Say: read ingredients or start cooking"
+    events:
+      list_ingredients:
+        next: start_cooking
+      cooking:
+        next: done
+
+  start_cooking:
+    reprompt: "Sorry, I didn't understand, do you want to go to the next or previous instruction?"
+    help: "You can say next or previous"
+    events:
+      finish_cooking:
+        next: done
+
+# no need to describe last step
+  done:
