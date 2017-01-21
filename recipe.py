@@ -1,22 +1,23 @@
 import urllib
 import re
 import pprint
+import db
 from food_network_wrapper import recipe_search, get_n_recipes, scrape_recipe
 
 BASE_URL = "http://www.foodnetwork.com"
 BASE_RECIPE_URL = "http://www.foodnetwork.com/recipes/a-z.html"
+FILTER_SYMBOLS = ["-", "with", "(", "\""]
 
 def main():
-    '''
-    dishes = scrape(baseUrl)
-    for entry in dishes:
-        recipe = getRecipe(entry)
-        print(recipe)
+    
+    db.initDB()
 
-    '''
-    print(getNameLinks(BASE_RECIPE_URL))
-    print(parseRecipes(getHTML(getLink(10, "http://www.foodnetwork.com/recipes/a-z.C.9.html"))))
-    #print(ret)
+    dishes = scrape(BASE_RECIPE_URL)
+    for entry in dishes:
+        r = getRecipe(entry)
+        #(parsed_title, description, r.total_time, r.servings, r.ingredients, r.directions, r.picture_url, r.categories)
+        db.logRecipe(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7])
+        print("Logged %s" % r[0])
 
 '''
 Scrapes Food Network starting at baseUrl for a list of dishes
@@ -33,9 +34,6 @@ def scrape(baseUrl):
             dishes = parseRecipes(html)
             for d in dishes:
                 recipes.add(d)
-
-    for recipe in recipes:
-        print recipe
 
     return recipes
 
@@ -76,12 +74,21 @@ def getNameLinks(baseUrl):
     return links
 
 '''
-TODO 
 Gets the maximum amount of pages (on bottom) for recipe
 @return int
 '''
 def getNumPages(link):
-    return 1
+    maxNum = 1
+    html = getHTML(link)
+    match = re.search('(?s)class="pagination">(.*?)</div>', html)
+    if match == None:
+        return 1
+    res = re.findall('(?s)<a href=".*?">(.*?)</a>', match.group(0))
+    for r in res:
+        if r.isdigit() and int(r) > maxNum:
+            maxNum = int(r)
+
+    return maxNum
 
 '''
 Formats new link given the next page to access and the current link
@@ -94,21 +101,34 @@ def getLink(i, link):
 '''
 Gets a list of recipes given a search value (dish)
 Returns a list of tuples: title,total time, prep time, cook time, servings, ingredients, directions
+'''
+def getRecipe(url):
+    print("Scraping: " + url)
+    r = scrape_recipe(url)
+    parsed_title, description = parseName(r.title)
+    return (parsed_title, description, r.total_time, getServings(r.servings), r.ingredients, r.directions, r.picture_url, r.categories)
 
 '''
-def getRecipe(recipe):
-    recipes = []
-    results = recipe_search(recipe)
-    for result in results:
-        print("Scraping %s: %s" % (result.title,result.url))
-        recipes.append(scrape_recipe(result.url))
+Parses out uneeded characters from dish name
+ex) Baby Back Racks (Paula Deen) -> Baby Back Racks
+'''
+def parseName(name):
+    parsed = name
+    desc = ""
+    for f in FILTER_SYMBOLS:
+        arr = parsed.split(f)
+        if len(arr) > 1:
+            desc = arr[1]
+        parsed = arr[0].strip()
+    return parsed, desc
 
-    ret = []
-    for r in recipes:
-        ret.append((r.title, r.total_time, r.prep_time, r.cook_time, r.servings, r.ingredients, r.directions))
-        print(r.categories)
-
-    return ret
+def getServings(servings):
+    arr = servings.split(" ")
+    for a in arr:
+        print(a)
+        if a.isdigit():
+            return int(a)
+    return 1
 
 if __name__ == "__main__":
     main()
