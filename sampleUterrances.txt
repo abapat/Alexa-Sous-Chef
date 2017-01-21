@@ -1,11 +1,16 @@
 AMAZON.YesIntent say hello
 
-RecipeIntent recipe {beef|Dish}
+RecipeIntent {beef|Dish} recipe
 RecipeIntent recipe for {beef|Dish}
 RecipeIntent get me a recipe {beef|Dish}
 RecipeIntent what's a recipe for {beef|Dish}
 RecipeIntent what is a recipe for {beef|Dish}
 RecipeIntent tell me a recipe for {beef|Dish}
 RecipeIntent I want a recipe for {beef|Dish}
+RecipeIntent How do I make {beef|Dish}
+RecipeIntent How do I cook {beef|Dish}
+RecipeIntent How do I bake {beef|Dish}
 
-PickIntent {beef|Selection}
+PickIntent {Selection}
+PickIntent number {Selection}
+PickIntent dish {Selection}
