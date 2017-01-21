@@ -32,11 +32,14 @@ def scrape(baseUrl):
     for link in getNameLinks(baseUrl):
         numPages = getNumPages(link)
         for i in range(1, numPages):
-            nextLink = getLink(i, link)
-            html = getHTML(nextLink)
-            dishes = parseRecipes(html)
-            for d in dishes:
-                recipes.add(d)
+            try:
+                nextLink = getLink(i, link)
+                html = getHTML(nextLink)
+                dishes = parseRecipes(html)
+                for d in dishes:
+                    recipes.add(d)
+            except Exception, e:
+                print(str(e))
 
     return recipes
 
@@ -109,7 +112,7 @@ def getRecipe(url):
     print("Scraping: " + url)
     r = scrape_recipe(url)
     parsed_title, description = parseName(r.title)
-    return (parsed_title, description, r.total_time, getServings(r.servings), r.ingredients, r.directions, r.picture_url, r.categories)
+    return (parsed_title, description, r.total_time, getServings(r.servings), delimitNewline(r.ingredients), delimitNewline(r.directions), r.picture_url, delimitNewline(r.categories))
 
 '''
 Parses out uneeded characters from dish name
@@ -124,6 +127,13 @@ def parseName(name):
             desc = arr[1]
         parsed = arr[0].strip()
     return parsed, desc
+
+def delimitNewline(arr):
+    s = ""
+    for a in arr:
+        s += a
+        s += "\n"
+    return s
 
 def getServings(servings):
     arr = servings.split(" ")
