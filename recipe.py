@@ -128,7 +128,6 @@ def parseName(name):
 def getServings(servings):
     arr = servings.split(" ")
     for a in arr:
-        print(a)
         if a.isdigit():
             return int(a)
     return 1
