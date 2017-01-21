@@ -36,7 +36,7 @@ def sendIngredients(Selection):
     text += " If you'd like me to read out the ingredients, tell me to list them."
     text += " Otherwise, say Let's Cook to let me know when you have everything."
     reprompt_text = "Sorry, I didn't hear what you said. Do you want me to read the ingredients or are you ready to start cooking?"
-    return question(text).reprompt(reprompt_text).simple_card()
+    return question(text).reprompt(reprompt_text).simple_card(selectedDish[1], session.attributes['ingredients'])
 
 @ask.intent('ListIngredients')
 def listIngredients():
@@ -65,7 +65,8 @@ def listIngredients():
 @ask.intent("CookingIntent")
 def cooking():
     selectedDishId = session.attributes['selectedDish'][0]
-    session.attributes['instructions'] = db.getDirections(selectedDishId)
+    session.attributes['instructions'] = db.getDirections(selectedDishId).split('.')
+    print session.attributes['instructions']
     text = session.attributes['instructions'][0]
     return question(text)
 
@@ -85,6 +86,7 @@ def instruction():
 @ask.intent('AMAZON.PreviousIntent')
 def goBack():
     global instructionCounter
+    instructions = session.attributes['instructions']
     if instructionCounter < 0:
         instructionCounter -= 1
         text=instructions[instructionCounter]
