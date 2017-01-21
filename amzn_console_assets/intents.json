@@ -29,7 +29,7 @@
         "slots": [
           {
           	"name": "Dish",
-            "type": "AMAZON.LITERAL"
+            "type": "LIST_OF_DISHES"
           }
         ]
       },
@@ -38,7 +38,7 @@
         "slots": [
           {
             "name": "Selection",
-            "type": "NUMBER"
+            "type": "LIST_OF_DISHES"
           }
         ]
       },
@@ -47,6 +47,9 @@
       },
       {
         "intent": "CookingIntent"
+      },
+      {
+        "intent": "ReturnIntent"
       }
   ]
 

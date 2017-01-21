@@ -25,23 +25,34 @@ steps:
       help: "Which dish would you like the ingredients for?"
       events:
         send_ingredients:
-          next: send_ingredients
+          next: read_ingredients_or_cook
 
-  send_ingredients:
+  read_ingredients_or_cook:
     reprompt: "Sorry, I didn't understand, did you want me to read the ingredients or start cooking?"
     help: "Say: read ingredients or start cooking"
     events:
       list_ingredients:
-        next: start_cooking
+        next: read_ingredients_or_cook
       cooking:
-        next: done
+        next: start_cooking
 
   start_cooking:
-    reprompt: "Sorry, I didn't understand, do you want to go to the next or previous instruction?"
+    reprompt: "Sorry, I didn't understand, do you want to go to the next instruction?"
     help: "You can say next or previous"
     events:
-      finish_cooking:
-        next: done
+      next_instruction:
+        next: instruction
+
+  instruction:
+      reprompt: "Sorry, I didn't understand, do you want to go to the next or previous instruction?"
+      help: "You can say next or previous"
+      events:
+        next_instruction:
+          next: instruction
+        previous_instruction:
+          next: instruction
+        done_cooking:
+          next: done
 
 # no need to describe last step
   done:
