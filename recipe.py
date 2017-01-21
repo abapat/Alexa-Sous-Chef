@@ -15,6 +15,7 @@ def main():
 
     '''
     print(getNameLinks(BASE_RECIPE_URL))
+    print(parseRecipes(getHTML(getLink(10, "http://www.foodnetwork.com/recipes/a-z.C.9.html"))))
     #print(ret)
 
 '''
@@ -49,15 +50,18 @@ def getHTML(url):
 
 
 '''
-TODO
 Parses HTML for list of dishes
 @return list of strings
 '''
 def parseRecipes(html):
-    return None
+    recipes = []
+    match = re.search('(?s)class="group">(.*?)</div>', html)
+    res = re.findall('(?s)class="arrow"><a href="(.*?)">', match.group(0))
+    for r in res:
+        recipes.append(BASE_URL + r)
+    return recipes
 
 '''
-TODO
 Gets links to all recipes- starting with A, B, C, ..., etc.
 @return list of links
 '''
@@ -72,7 +76,7 @@ def getNameLinks(baseUrl):
     return links
 
 '''
-TODO
+TODO 
 Gets the maximum amount of pages (on bottom) for recipe
 @return int
 '''
@@ -80,13 +84,12 @@ def getNumPages(link):
     return 1
 
 '''
-TODO
 Formats new link given the next page to access and the current link
 ex) i= 10, http://www.foodnetwork.com/recipes/a-z.C.9.html -> http://www.foodnetwork.com/recipes/a-z.C.10.html
 @return String
 '''
 def getLink(i, link):
-    return None
+    return link[:link[:link.rfind(".")].rfind(".")] + "." + str(i) + ".html" #jank af
 
 '''
 Gets a list of recipes given a search value (dish)
