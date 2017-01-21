@@ -24,8 +24,8 @@ def logRecipe(title, description, cook_time, servings, ingredients, directions, 
     conn = getConn()
     cursor = conn.cursor()
 
-    sql = "Insert into recipe(title, description, cook_time, servings, ingredients, directions, image_url, category) values ('%s','%s','%s',%s,'%s','%s','%s', '%s');" % (title, description, cook_time, servings, ingredients, directions, image_url, category)
-    print(sql)
+    sql = "Insert into recipe(title, description, cook_time, servings, ingredients, directions, image_url, category) values ('%s','%s','%s',%s,'%s','%s','%s', '%s');" % (title.replace("'", ""), description.replace("'", ""), cook_time.replace("'", ""), servings, ingredients.replace("'", ""), directions.replace("'", ""), image_url.replace("'", ""), category.replace("'", ""))
+    #print(sql)
     cursor = conn.cursor()
     cursor.execute(sql)
     conn.commit()

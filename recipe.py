@@ -15,7 +15,7 @@ def main():
     dishes = scrape(BASE_RECIPE_URL)
     for entry in dishes:
         r = getRecipe(entry)
-        if r[0] != None and r[0] != "":
+        if r != None and r[0] != None and r[0] != "":
             try:
                 db.logRecipe(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7])
                 print("Logged %s" % r[0])
@@ -110,9 +110,13 @@ Returns a list of tuples: title,total time, prep time, cook time, servings, ingr
 '''
 def getRecipe(url):
     print("Scraping: " + url)
-    r = scrape_recipe(url)
-    parsed_title, description = parseName(r.title)
-    return (parsed_title, description, r.total_time, getServings(r.servings), delimitNewline(r.ingredients), delimitNewline(r.directions), r.picture_url, delimitNewline(r.categories))
+    try:
+        r = scrape_recipe(url)
+        parsed_title, description = parseName(r.title)
+        return (parsed_title, description, r.total_time, getServings(r.servings), delimitNewline(r.ingredients), delimitNewline(r.directions), r.picture_url, delimitNewline(r.categories))
+    except Exception, e:
+        print(str(e))
+        return None
 
 '''
 Parses out uneeded characters from dish name
