@@ -1,0 +1,32 @@
+{
+    "intents": [
+      {
+        "intent": "AMAZON.YesIntent"
+      },
+      {
+        "intent": "AMAZON.NoIntent"
+      },
+      {
+        "intent": "AMAZON.CancelIntent"
+      },
+      {
+        "intent": "MAZON.NextIntent"
+      },
+      {
+        "intent": "AMAZON.PreviousIntent"
+      },
+      {
+        "intent": "AMAZON.RepeatIntent"
+      },
+      {
+        "intent": "AMAZON.StopIntent"
+      },
+      {
+        "intent": "AMAZON.HelpIntent"
+      },
+      {
+        "intent": "HelloWorldIntent"
+      }
+  ]
+
+}
