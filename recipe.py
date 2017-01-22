@@ -13,6 +13,11 @@ def main():
     db.initDB()
 
     dishes = scrape(BASE_RECIPE_URL)
+    with open("links.txt", "w") as f:
+        for d in dishes:
+            f.write(d + "\n")
+    print(len(dishes))
+    '''
     for entry in dishes:
         r = getRecipe(entry)
         if r != None and r[0] != None and r[0] != "":
@@ -21,6 +26,7 @@ def main():
                 print("Logged %s" % r[0])
             except Exception, e:
                 print("Could not log recipe for %s: %s", (r[0], str(e)))
+    '''
 
 '''
 Scrapes Food Network starting at baseUrl for a list of dishes
