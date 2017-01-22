@@ -4,6 +4,8 @@ from afg import Supervisor
 from collections import OrderedDict
 import db
 import re
+import httplib, urllib, base64
+import defines
 
 app = Flask(__name__)
 ask = Ask(app, '/')
@@ -30,14 +32,17 @@ def session_ended():
 @sup.guide
 def launched():
     speech_text = render_template('welcome')
+    session.attributes['repeat'] = speech_text
     return question(speech_text).reprompt(speech_text)
 
 @ask.intent('RecipeIntent')
 @sup.guide
-def get_recipes(Dish):
+def get_recipes(Dish, Healthy):
     app.logger.debug(Dish)
     if Dish == None:
         return sup.reprompt_error
+
+    app.logger.debug(Healthy)
 
     session.attributes['dishes'] = db.getRecipe(Dish)
     app.logger.debug(session.attributes['dishes'])
@@ -47,17 +52,33 @@ def get_recipes(Dish):
     if len(dishResults) == 0:
         return sup.reprompt_error
 
-    for x in range(len(dishResults)):
-        text += " Dish " + str(x+1) + " " + dishResults[x][1] + ","
+    for x in range(5):
+        if x < len(dishResults):
+            text += " Dish " + str(x+1) + ", " + dishResults[x][1] + ","
 
-    text += ". Please say the dish you'd like to make, or say more for more options."
+    text += ". Please say the dish you'd like to make."
     reprompt_text = "I didn't catch that. What would you like to make?"
 
     options = ""
     for x in dishResults:
         options += x[1] + "\n"
 
+    session.attributes['repeat'] = text
     return question(text).reprompt(reprompt_text).simple_card("Recipes", options)
+
+@ask.intent('NewSearchIntent')
+@sup.guide
+def new_search():
+    text = "Okay, let's try some new recipes. Please tell me your new search."
+    return question(text)
+
+@ask.intent('OptionsIntent')
+@sup.guide
+def return_to_options():
+    options = ""
+    for x in session.attributes['dishes']:
+        options += x[1] + ". \n"
+    return question(options)
 
 @ask.intent('PickIntent')
 @sup.guide
@@ -74,11 +95,10 @@ def send_ingredients(Selection):
     text = render_template('ingredients', Dish=selectedDish[1])
     session.attributes['ingredients'] = db.getIngredients(selectedDish[0])
     session.attributes['ingredientsList'] = session.attributes['ingredients'].split('\n')
-    app.logger.debug("getting other")
-    otherInfo = db.getOtherInfo(selectedDish[0])
-    app.logger.debug(otherInfo)
-    selectedDishImage = otherInfo[2]
-    return question(text).standard_card(selectedDish[1], session.attributes['ingredients'], "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api", "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api")
+    imageUrl = getThumbnail(selectedDish[1])
+    imageUrl = imageUrl.replace("\\", "")
+    session.attributes['repeat'] = text
+    return question(text).standard_card(selectedDish[1], session.attributes['ingredients'], imageUrl, imageUrl)
 
 @ask.intent('ListIngredients')
 @sup.guide
@@ -98,9 +118,10 @@ def list_ingredients():
 
     if ingredientIndex < len(ingredients):
         text = text + "Say more for the next ingredients."
-    else:
+    elif text == "":
         return cooking()
 
+    session.attributes['repeat'] = text
     return question(text)
 
 @ask.intent("CookingIntent")
@@ -109,7 +130,9 @@ def cooking():
     text = "Alright, we're ready to cook! "
     selectedDishId = session.attributes['selectedDish'][0]
     session.attributes['instructions'] = db.getDirections(selectedDishId).split('.')
-    text = session.attributes['instructions'][0]
+    text += session.attributes['instructions'][0]
+
+    session.attributes['repeat'] = text
     return question(text)
 
 @ask.intent('AMAZON.NextIntent')
@@ -123,6 +146,7 @@ def next_instruction():
     else:
         return done_cooking()
 
+    session.attributes['repeat'] = text
     return question(text)
 
 @ask.intent('AMAZON.PreviousIntent')
@@ -138,6 +162,7 @@ def previous_instruction():
         text = instructions[instructionCounter] + ". This is the first step."
         instructionCounter = 0
 
+    session.attributes['repeat'] = text
     return question(text)
 
 @sup.guide
@@ -148,8 +173,8 @@ def done_cooking():
 @ask.intent('AMAZON.HelpIntent')
 def help():
     context_help = sup.get_help()
+    session.attributes['repeat'] = context_help
     return question(context_help)
-
 
 @ask.intent('AMAZON.CancelIntent')
 def cancel():
@@ -161,6 +186,11 @@ def cancel():
 def stop():
     close_user_session()
     return statement(render_template('stop'))
+
+@ask.intent('AMAZON.RepeatIntent')
+def repeat():
+    app.logger.debug(session.attributes['repeat'])
+    return question(session.attributes['repeat'])
 
 ###helper methods
 def searchRecipe(tupRecipes, searchTerm):
@@ -174,6 +204,30 @@ def searchRecipe(tupRecipes, searchTerm):
         if re.search(searchTerm, tup[1], re.IGNORECASE):
             return tup
     return None
+
+
+def getThumbnail(title):
+    params = urllib.urlencode({
+        # Request parameters
+        'q': title,
+        'count': '1',
+        'offset': '0',
+        'mkt': 'en-us',
+        'safeSearch': 'Moderate',
+    })
+
+    try:
+        conn = httplib.HTTPSConnection('api.cognitive.microsoft.com')
+        conn.request("GET", "/bing/v5.0/images/search?%s" % params, "{body}", defines.headers)
+        response = conn.getresponse()
+        data = response.read()
+        res = re.findall('"thumbnailUrl": "(.*?)"', data)
+        conn.close()
+        if res == None:
+            return None
+        return res[0]
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

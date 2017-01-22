@@ -46,7 +46,7 @@ def getRecipe(title):
     cursor = conn.cursor()
 
     sql = "Select id,title from recipe where title like '%" + title + "%' limit " + str(MAX_RESULTS) + ";"
-    
+
     cursor.execute(sql)
     res = cursor.fetchall()
     return res
@@ -56,7 +56,7 @@ def getIngredients(i):
     cursor = conn.cursor()
 
     sql = "Select ingredients from recipe where id=%s;" % i
-    
+
     cursor.execute(sql)
     res = cursor.fetchone()
     conn.close()
@@ -70,7 +70,7 @@ def getDirections(i):
     cursor = conn.cursor()
 
     sql = "Select directions from recipe where id=%s;" % i
-    
+
     cursor.execute(sql)
     res = cursor.fetchone()
     conn.close()
@@ -84,7 +84,7 @@ def getOtherInfo(i):
     cursor = conn.cursor()
 
     sql = "Select cook_time,servings,image_url from recipe where id=%s;" % i
-    
+
     cursor.execute(sql)
     res = cursor.fetchone()
     conn.close()
@@ -93,4 +93,3 @@ def getOtherInfo(i):
 
 if __name__ == "__main__":
     main()
-

@@ -22,10 +22,14 @@ steps:
 
   ingredients:
       reprompt: "Sorry, I didn't understand, can you say the dish again?"
-      help: "Which dish would you like the ingredients for?"
+      help: "Which dish would you like the ingredients for? You can also go back to the menu"
       events:
+        return_to_options:
+          next: ingredients
         send_ingredients:
           next: read_ingredients_or_cook
+        new_search:
+          next: search_recipe
 
   read_ingredients_or_cook:
     reprompt: "Sorry, I didn't understand, did you want me to read the ingredients or start cooking?"
@@ -37,15 +41,15 @@ steps:
         next: start_cooking
 
   start_cooking:
-    reprompt: "Sorry, I didn't understand, do you want to go to the next instruction?"
-    help: "You can say next or previous"
+    reprompt: "Sorry, I didn't understand, if you want to go the next instruction, say next."
+    help: "You can say next or previous to go through instructions"
     events:
       next_instruction:
         next: instruction
 
   instruction:
-      reprompt: "Sorry, I didn't understand, do you want to go to the next or previous instruction?"
-      help: "You can say next or previous"
+      reprompt: "Sorry, I didn't understand, do you want to go to the next, or previous, instruction?"
+      help: "You can say next or previous to go through instructions"
       events:
         next_instruction:
           next: instruction
