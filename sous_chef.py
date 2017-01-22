@@ -236,6 +236,7 @@ def getThumbnail(title):
 def getHealthyRecipe(name):
     rid = getRecipe(name)
     steps = getSteps(rid[0])
+    #title, image_url, calories, fat, array of directions
     tup = (rid[1], rid[2], rid[3], rid[4], steps)
     return tup
 
