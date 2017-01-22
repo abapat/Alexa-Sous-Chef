@@ -1,2 +1,7 @@
-recipe: I found 3 dishes for {{ Dish }}.
-ingredients: Ingredients for Dish {{ Selection }}
+recipe: I found {{ numResults }} dishes for {{ Dish }}.
+ingredients: Okay, I'm sending the ingredient list for {{ Dish }} to your phone. Let me know if you want me to read them out loud. Otherwise, say Let's Cook! when you're ready to start.
+help: You can ask me for recipes! Like, recipes for beef stew. Or, tell me how to make Philly Cheesesteaks.
+done: No more instructions. Bon appetite!
+stop: See you later
+cancel: You interrupted the skill, bye
+welcome: Welcome to soo-shef, you can ask me for recipes.

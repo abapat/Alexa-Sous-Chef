@@ -1,0 +1,48 @@
+AMAZON.YesIntent say hello
+
+AMAZON.NextIntent next
+AMAZON.NextIntent next instruction
+AMAZON.NextIntent next direction
+AMAZON.NextIntent next step
+AMAZON.NextIntent continue
+
+RecipeIntent {Dish}
+RecipeIntent {Dish} recipe
+RecipeIntent recipe for {Dish}
+RecipeIntent recipes for {Dish}
+RecipeIntent get me a recipe {Dish}
+RecipeIntent get a recipe for {Dish}
+RecipeIntent find recipes for {Dish}
+RecipeIntent what's a recipe for {Dish}
+RecipeIntent what is a recipe for {Dish}
+RecipeIntent tell me a recipe for {Dish}
+RecipeIntent tell me how to make {Dish}
+RecipeIntent I want a recipe for {Dish}
+RecipeIntent I want to make {Dish}
+RecipeIntent How do I make {Dish}
+RecipeIntent How do I cook {Dish}
+RecipeIntent How do I bake {Dish}
+RecipeIntent Search for {Dish}
+RecipeIntent Search for recipes for {Dish}
+
+PickIntent {Selection}
+PickIntent number {Selection}
+PickIntent recipe {Selection}
+
+ListIngredients Read
+ListIngredients Read the ingredients
+ListIngredients Read them out loud
+ListIngredients Read them
+ListIngredients List the ingredients
+ListIngredients Tell me the ingredients
+ListIngredients Tell me more ingredients
+ListIngredients More ingredients
+ListIngredients More
+
+CookingIntent cook
+CookingIntent Let's cook
+CookingIntent Start cooking
+
+ReturnIntent Go back
+ReturnIntent Previous
+ReturnIntent Undo

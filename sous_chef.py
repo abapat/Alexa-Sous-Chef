@@ -1,73 +1,180 @@
 from flask import Flask, render_template
 from flask_ask import Ask, request, session, question, statement
+from afg import Supervisor
+from collections import OrderedDict
+import db
+import re
 
 app = Flask(__name__)
 ask = Ask(app, '/')
+sup = Supervisor("scenario.yaml")
 
-ingredients = [
-'120mg water', '300g beef', '10lbs chicken', 'test', 'tesint', 'rewrwf'
-]
 ingredientIndex = 0
+instructionCounter = 1
 
-instructions = [
-'1. Boil water', '2. Peel potatoes', '3. Eat potatoes'
-]
-instructionCounter = 0
+@ask.on_session_started
+@sup.start
+def new_session():
+    app.logger.debug('new session started')
+
+@sup.stop
+def close_user_session():
+    app.logger.debug("user session stopped")
+
+@ask.session_ended
+def session_ended():
+    close_user_session()
+    return "", 200
 
 @ask.launch
-def launch():
-    speech_text = 'Welcome to Sous Chef, you can ask me for recipes.'
+@sup.guide
+def launched():
+    speech_text = render_template('welcome')
     return question(speech_text).reprompt(speech_text)
 
 @ask.intent('RecipeIntent')
-def recipe(Dish):
-    text = render_template('recipe', Dish=Dish)
-    text += " Dish 1: beef stew. Dish 2: beef stroganoff. Please say the dish number you'd like to make, or say more for more options."
+@sup.guide
+def get_recipes(Dish):
+    app.logger.debug(Dish)
+    if Dish == None:
+        return sup.reprompt_error
+
+    session.attributes['dishes'] = db.getRecipe(Dish)
+    app.logger.debug(session.attributes['dishes'])
+    dishResults = session.attributes['dishes']
+
+    text = render_template('recipe', numResults = str(len(dishResults)), Dish = Dish)
+    if len(dishResults) == 0:
+        return sup.reprompt_error
+
+    for x in range(len(dishResults)):
+        text += " Dish " + str(x+1) + " " + dishResults[x][1] + ","
+
+    text += ". Please say the dish you'd like to make, or say more for more options."
     reprompt_text = "I didn't catch that. What would you like to make?"
-    session.attributes['dish'] = Dish
-    return question(text).reprompt(reprompt_text)
 
-@ask.intent('PickIntent', convert={'Selection': int})
-def listIngredients(Selection):
+    options = ""
+    for x in dishResults:
+        options += x[1] + "\n"
 
+    return question(text).reprompt(reprompt_text).simple_card("Recipes", options)
+
+@ask.intent('PickIntent')
+@sup.guide
+def send_ingredients(Selection):
+    selectedTuple = searchRecipe(session.attributes['dishes'], Selection)
+    print selectedTuple
+
+    if selectedTuple == None:
+        return sup.reprompt_error
+
+
+    session.attributes['selectedDish'] = selectedTuple
+    selectedDish = selectedTuple
+    text = render_template('ingredients', Dish=selectedDish[1])
+    session.attributes['ingredients'] = db.getIngredients(selectedDish[0])
+    session.attributes['ingredientsList'] = session.attributes['ingredients'].split('\n')
+    app.logger.debug("getting other")
+    otherInfo = db.getOtherInfo(selectedDish[0])
+    app.logger.debug(otherInfo)
+    selectedDishImage = otherInfo[2]
+    return question(text).standard_card(selectedDish[1], session.attributes['ingredients'], "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api", "https://tse4.mm.bing.net/th?id=OIP.M1f6a10f0cd04b2de8707fc5d4874391bo0&pid=Api")
+
+@ask.intent('ListIngredients')
+@sup.guide
+def list_ingredients():
     text = ""
     global ingredientIndex
-
-    if ingredientIndex == 0:
-        text += render_template('ingredients', Selection=str(Selection))
-
+    ingredients = session.attributes['ingredientsList']
     for x in range(5):
         if ingredientIndex < len(ingredients):
             text += ingredients[ingredientIndex] + ", "
             ingredientIndex += 1
         else:
             break;
-    #if ingredientIndex < len(ingredients) - 1:
-    #    text = text + "Say more for the next ingredients."
-    #else:
-    #    text = text + "Those are all the ingredients. We're ready to cook!"
 
-    #if ingredientIndex < 5:
-    #    return question(text).simple_card('Ingredients for dish ' + str(Selection), ingredients)
+    print ingredientIndex
+    print len(ingredients)
+
+    if ingredientIndex < len(ingredients):
+        text = text + "Say more for the next ingredients."
+    else:
+        return cooking()
 
     return question(text)
 
+@ask.intent("CookingIntent")
+@sup.guide
+def cooking():
+    text = "Alright, we're ready to cook! "
+    selectedDishId = session.attributes['selectedDish'][0]
+    session.attributes['instructions'] = db.getDirections(selectedDishId).split('.')
+    text = session.attributes['instructions'][0]
+    return question(text)
+
 @ask.intent('AMAZON.NextIntent')
-def instruction():
+@sup.guide
+def next_instruction():
     global instructionCounter
+    instructions = session.attributes['instructions']
     if instructionCounter < len(instructions) - 1:
+        text = instructions[instructionCounter]
         instructionCounter += 1
-        text=instructions[instructionCounter]
     else:
-        text="No more instructions. Bon appetite!"
+        return done_cooking()
 
-    return statement(text)
+    return question(text)
 
+@ask.intent('AMAZON.PreviousIntent')
+@sup.guide
+def previous_instruction():
+    global instructionCounter
+    instructions = session.attributes['instructions']
+
+    if instructionCounter > 0:
+        instructionCounter -= 1
+        text = instructions[instructionCounter]
+    else:
+        text = instructions[instructionCounter] + ". This is the first step."
+        instructionCounter = 0
+
+    return question(text)
+
+@sup.guide
+def done_cooking():
+    close_user_session()
+    return statement(render_template('done'))
 
 @ask.intent('AMAZON.HelpIntent')
 def help():
-    speech_text = 'You can ask me for recipes! Like, recipes for beef stew. Or, tell me how to make Philly Cheesesteaks.'
-    return question(speech_text).reprompt(speech_text)
+    context_help = sup.get_help()
+    return question(context_help)
+
+
+@ask.intent('AMAZON.CancelIntent')
+def cancel():
+    close_user_session()
+    return statement(render_template('cancel'))
+
+
+@ask.intent('AMAZON.StopIntent')
+def stop():
+    close_user_session()
+    return statement(render_template('stop'))
+
+###helper methods
+def searchRecipe(tupRecipes, searchTerm):
+    #try exact match first
+    for tup in tupRecipes:
+        if searchTerm.lower() == tup[1].lower:
+            return tup
+
+    #now try case insensitive substrings
+    for tup in tupRecipes:
+        if re.search(searchTerm, tup[1], re.IGNORECASE):
+            return tup
+    return None
+
 
 if __name__ == '__main__':
     app.run(debug=True)
