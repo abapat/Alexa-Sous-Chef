@@ -24,7 +24,7 @@ def getRecipe(name):
         response = conn.getresponse()
         data = response.read()
         jdata = json.loads(data)
-        #print(jdata["results"][0])
+        print(jdata["results"][0])
         return (jdata["results"][0]['id'], jdata["results"][0]['title'], jdata["results"][0]['image'], jdata["results"][0]['calories'], jdata["results"][0]['fat'])
     except Exception, e:
         print(e)
@@ -70,4 +70,3 @@ def getIngredients(recipeID):
 
 if __name__ == "__main__":
     main()
-

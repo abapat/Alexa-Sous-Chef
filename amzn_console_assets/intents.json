@@ -1,12 +1,6 @@
 {
     "intents": [
       {
-        "intent": "AMAZON.YesIntent"
-      },
-      {
-        "intent": "AMAZON.NoIntent"
-      },
-      {
         "intent": "AMAZON.CancelIntent"
       },
       {
@@ -30,6 +24,10 @@
           {
           	"name": "Dish",
             "type": "LIST_OF_DISHES"
+          },
+          {
+            "name": "Healthy",
+            "type": "HEALTHY_WORDS"
           }
         ]
       },
@@ -50,6 +48,12 @@
       },
       {
         "intent": "ReturnIntent"
+      },
+      {
+        "intent": "OptionsIntent"
+      },
+      {
+        "intent": "NewSearchIntent"
       }
   ]
 

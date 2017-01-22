@@ -41,7 +41,7 @@ steps:
         next: start_cooking
 
   start_cooking:
-    reprompt: "Sorry, I didn't understand, if you want to go the next instruction, say next."
+    reprompt: "Sorry, I didn't understand, if you want to go to the next instruction, say next."
     help: "You can say next or previous to go through instructions"
     events:
       next_instruction:

@@ -17,6 +17,7 @@ sup = Supervisor("scenario.yaml")
 
 ingredientIndex = 0
 instructionCounter = 1
+health = False
 
 @ask.on_session_started
 @sup.start
@@ -46,9 +47,23 @@ def get_recipes(Dish, Healthy):
     if Dish == None:
         return sup.reprompt_error
 
+    session.attributes['dishes'] = db.getRecipe(Dish)
+
     app.logger.debug(Healthy)
 
-    session.attributes['dishes'] = db.getRecipe(Dish)
+    global health
+    if Healthy != None:
+        health = True
+        searchDish = Dish
+        if searchDish == None:
+            searchDish = "sandwich"
+        res = getHealthyRecipe(searchDish)
+        session.attributes['dishes'] = res
+        app.logger.debug(res)
+        app.logger.debug(res[0])
+        text = "Here's a recipe I found, " + res[0]
+        return question(text).simple_card("Option", res[0])
+
     app.logger.debug(session.attributes['dishes'])
     dishResults = session.attributes['dishes']
 
@@ -87,6 +102,23 @@ def return_to_options():
 @ask.intent('PickIntent')
 @sup.guide
 def send_ingredients(Selection):
+
+    global health
+    if health == True:
+        dish = session.attributes['dishes']
+        text = render_template('ingredients', Dish=dish[0])
+        session.attributes['ingredientsList'] = dish[4]
+        app.logger.debug(session.attributes['dishes'])
+
+        ingredientList = ""
+        for x in session.attributes['ingredientsList']:
+            ingredientList += x + '\n'
+
+        imageUrl = getThumbnail(dish[0])
+        cardContent = "Calories: " + str(dish[2]) + "\n" + ingredientList
+        return question(text).standard_card(dish[0], cardContent , dish[1], dish[1])
+
+
     selectedTuple = searchRecipe(session.attributes['dishes'], Selection)
     print selectedTuple
 
@@ -132,6 +164,14 @@ def list_ingredients():
 @sup.guide
 def cooking():
     text = "Alright, we're ready to cook! "
+
+    global health
+    if health == True:
+        app.logger.debug(session.attributes['dishes'][5])
+        session.attributes['instructions'] = session.attributes['dishes'][5]
+        text += session.attributes['instructions'][0]
+        return question(text)
+
     selectedDishId = session.attributes['selectedDish'][0]
     session.attributes['instructions'] = db.getDirections(selectedDishId).split('.')
     text += session.attributes['instructions'][0]
@@ -236,8 +276,8 @@ def getThumbnail(title):
 def getHealthyRecipe(name):
     rid = getRecipe(name)
     steps = getSteps(rid[0])
-    #title, image_url, calories, fat, array of directions
-    tup = (rid[1], rid[2], rid[3], rid[4], steps)
+    ingredients = getIngredients(rid[0])
+    tup = (rid[1], rid[2], rid[3], rid[4], ingredients, steps)
     return tup
 
 def getRecipe(name):
@@ -248,7 +288,6 @@ def getRecipe(name):
         response = conn.getresponse()
         data = response.read()
         jdata = json.loads(data)
-        #print(jdata["results"][0])
         return (jdata["results"][0]['id'], jdata["results"][0]['title'], jdata["results"][0]['image'], jdata["results"][0]['calories'], jdata["results"][0]['fat'])
     except Exception, e:
         print(e)
@@ -267,6 +306,25 @@ def getSteps(recipeID):
         for step in jdata[0]['steps']:
             steps.append(step['step'])
         return steps
+    except Exception, e:
+        print(e)
+
+    return None
+
+def getIngredients(recipeID):
+    try:
+        conn = httplib.HTTPSConnection('spoonacular-recipe-food-nutrition-v1.p.mashape.com')
+        url = "/recipes/%s/information?includeNutrition=false" % recipeID
+        conn.request("GET", url, "{body}", defines.headers2)
+        response = conn.getresponse()
+        data = response.read()
+        jdata = json.loads(data)
+
+        ingredients = []
+        arr = jdata["extendedIngredients"]
+        for a in arr:
+            ingredients.append(a["originalString"])
+        return ingredients
     except Exception, e:
         print(e)
 

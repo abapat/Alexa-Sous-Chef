@@ -1,18 +1,31 @@
-AMAZON.YesIntent say hello
 
 AMAZON.NextIntent next
 AMAZON.NextIntent next instruction
 AMAZON.NextIntent next direction
 AMAZON.NextIntent next step
 AMAZON.NextIntent continue
+AMAZON.NextIntent what do I do next
+
+AMAZON.RepeatIntent what
+AMAZON.RepeatIntent what did you say
+AMAZON.RepeatIntent i didn't hear you
+AMAZON.RepeatIntent what now
+AMAZON.RepeatIntent repeat what you said
+AMAZON.RepeatIntent could you repeat what you said
 
 RecipeIntent {Dish}
 RecipeIntent {Dish} recipe
+RecipeIntent {Dish} recipes
 RecipeIntent recipe for {Dish}
 RecipeIntent recipes for {Dish}
 RecipeIntent get me a recipe {Dish}
 RecipeIntent get a recipe for {Dish}
+RecipeIntent give me recipes with {Dish}
+RecipeIntent give me recipes for {Dish}
+RecipeIntent can I have recipes for {Dish}
 RecipeIntent find recipes for {Dish}
+RecipeIntent find a recipe for {Dish}
+RecipeIntent find a {Dish} recipe
 RecipeIntent what's a recipe for {Dish}
 RecipeIntent what is a recipe for {Dish}
 RecipeIntent tell me a recipe for {Dish}
@@ -24,25 +37,76 @@ RecipeIntent How do I cook {Dish}
 RecipeIntent How do I bake {Dish}
 RecipeIntent Search for {Dish}
 RecipeIntent Search for recipes for {Dish}
+RecipeIntent Can you suggest something with {Dish}
+
+RecipeIntent {Healthy} {Dish}
+RecipeIntent {Healthy} {Dish} recipe
+RecipeIntent {Healthy} {Dish} recipes
+RecipeIntent Can you suggest a {Healthy} recipe for {Dish}
+RecipeIntent Can you suggest {Healthy} {Dish}
+RecipeIntent I want a recipe for {Healthy} {Dish}
+RecipeIntent Tell me a recipe for {Healthy} {Dish}
+RecipeIntent How do I make {Healthy} {Dish}
+RecipeIntent I need a {Healthy} version of {Dish}
+RecipeIntent Give me a {Healthy} version of {Dish}
+RecipeIntent Give me a {Healthy} {Dish}
+RecipeIntent Do you have {Dish} that is {Healthy}
+RecipeIntent Do you have {Dish} that's {Healthy}
+RecipeIntent I want something {Healthy}
+RecipeIntent Can you suggest something {Healthy}
 
 PickIntent {Selection}
 PickIntent number {Selection}
 PickIntent recipe {Selection}
 
+OptionsIntent can you read back the recipes
+OptionsIntent what are my options again
+OptionsIntent what did you say I could cook
+OptionsIntent can I go back to the options
+OptionsIntent can I go back to the dishes
+OptionsIntent can I go back to the recipes
+OptionsIntent can you list the recipes again
+OptionsIntent can you list the dishes again
+OptionsIntent list the dishes again
+OptionsIntent dishes again
+OptionsIntent options again
+OptionsIntent recipes again
+
 ListIngredients Read
+ListIngredients Read ingredients
 ListIngredients Read the ingredients
+ListIngredients Can you read the ingredients
+ListIngredients Please read the ingredients
+ListIngredients Please read the ingredients
+ListIngredients Could you
 ListIngredients Read them out loud
+ListIngredients Read them out
 ListIngredients Read them
 ListIngredients List the ingredients
+ListIngredients List ingredients
+ListIngredients List them
 ListIngredients Tell me the ingredients
 ListIngredients Tell me more ingredients
+ListIngredients Tell me ingredients
+ListIngredients Tell me them
 ListIngredients More ingredients
 ListIngredients More
 
 CookingIntent cook
 CookingIntent Let's cook
 CookingIntent Start cooking
+CookingIntent Let's start
+CookingIntent Ready to cook
+CookingIntent I've got all the ingredients
 
-ReturnIntent Go back
-ReturnIntent Previous
-ReturnIntent Undo
+NewSearchIntent can I do a new search
+NewSearchIntent I'd like to search again
+NewSearchIntent let's find a different recipe
+NewSearchIntent I want new recipes
+NewSearchIntent these recipes don't sound so hot
+NewSearchIntent can we find some new dishes
+NewSearchIntent I don't like these dishes
+NewSearchIntent I want new dishes
+NewSearchIntent Let's try again
+NewSearchIntent Let's search again
+NewSearchIntent can we try again
