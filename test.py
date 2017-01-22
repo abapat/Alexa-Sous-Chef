@@ -6,10 +6,14 @@ import json
 MAX_CALORIES = 600
 MAX_FAT = 30
 
+def main():
+    getHealthyRecipe("cake")
+
 def getHealthyRecipe(name):
     rid = getRecipe(name)
     steps = getSteps(rid[0])
-    tup = (rid[1], rid[2], rid[3], rid[4], steps)
+    ingredients = getIngredients(rid[0])
+    tup = (rid[1], rid[2], rid[3], rid[4], ingredients, steps)
     print(tup)
 
 def getRecipe(name):
@@ -39,6 +43,25 @@ def getSteps(recipeID):
         for step in jdata[0]['steps']:
             steps.append(step['step'])
         return steps
+    except Exception, e:
+        print(e)
+
+    return None
+
+def getIngredients(recipeID):
+    try:
+        conn = httplib.HTTPSConnection('spoonacular-recipe-food-nutrition-v1.p.mashape.com')
+        url = "/recipes/%s/information?includeNutrition=false" % recipeID
+        conn.request("GET", url, "{body}", defines.headers2)
+        response = conn.getresponse()
+        data = response.read()
+        jdata = json.loads(data)
+
+        ingredients = []
+        arr = jdata["extendedIngredients"]
+        for a in arr:
+            ingredients.append(a["originalString"])
+        return ingredients
     except Exception, e:
         print(e)
 
