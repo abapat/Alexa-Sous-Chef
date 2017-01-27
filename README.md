@@ -6,5 +6,5 @@ Sous Chef is an Alexa skill which allows you to use your Amazon Echo as a recipe
 Sous Chef was developed using
 - [Flask-Ask](https://github.com/johnwheeler/flask-ask)
 - [Alexa Flask ASK Guide Library](https://github.com/dgtony/afg)
-- A custom db of recipies
+- A custom db of recipes
 - Bing Image Search API
